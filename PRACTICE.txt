@@ -1,0 +1,211 @@
+SELECT LOC FROM DEPT
+WHERE DEPTNO IN( SELECT DEPTNO  FROM EMP
+WHERE SAL IN(SELECT SAL FROM(SELECT ROWNUM AS SRNO,SAL
+                                                       FROM(SELECT DISTINCT SAL FROM EMP
+                                                                    ORDER BY SAL DESC))
+WHERE SRNO=7));
+
+OP=
+LOC
+-------------
+CHICAGO
+
+SELECT * FROM EMP
+WHERE MOD(TO_CHAR(HIREDATE,'YY'),4)=0
+AND   MOD(TO_CHAR(HIREDATE,'YYYY'),100)!=0
+OR  MOD(TO_CHAR(HIREDATE,'YYYY'),400)=0;
+
+OP= 
+ EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+------- ---------- --------- ---------- --------- ---------- ---------- ----------
+   7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+
+SELECT * FROM EMP
+WHERE MOD(LENGTH(ENAME),2)=0;EVEN
+
+SELECT * FROM EMP
+WHERE MOD(LENGTH(ENAME),2)!=0; ODD
+
+10TH MIN EMP=MGR 
+
+SELECT ENAME FROM EMP 
+WHERE MGR IN(SELECT EMPNO FROM EMP
+                              WHERE SAL IN (SELECT SAL 
+                                                           FROM(SELECT ROWNUM AS SRNO 
+                                                           FROM(SELECT DISTINCT SAL FROM  EMP 
+                                      ORDER BY SAL ASC))
+WHERE SRNO=10));
+
+OP=13 ROWS SELECTED
+
+
+SELECT E1.ENAME AS EMP_NAME,D1.DNAME  AS  DEPT_NAME,E2.ENAME  AS MGR_NAME,D2.DNAME   AS  MGR_DNAME,E3.ENAME AS MGRS_NAME,D3.DNAME AS MGRS_MGR_DNAME
+FROM EMP E1,EMP E2,EMP E3,DEPT D1,DEPT D2,DEPT D3
+WHERE E1.MGR=E2.EMPNO
+AND E2.MGR=E3.EMPNO
+AND E1.DEPTNO=D1.DEPTNO
+AND E2.DEPTNO=D1.DEPTNO
+AND E3.DEPTNO=D2.DEPTNO
+AND E1.HIREDATE>(SELECT HIREDATE FROM EMP
+                                     WHERE ENAME='MILLER')
+AND E2.SAL>(SELECT SAL 
+                         FROM(SELECT ROWNUM AS SRNO,SAL
+                         FROM(SELECT DISTINCT SAL FROM EMP
+                         ORDER BY SAL DESC))
+WHERE SRNO=3)AND
+D3.LOC IN('NEW YORK','DALLAS')
+AND E2.HIREDATE NOT LIKE '%82' 
+AND E2.SAL>ALL(SELECT SAL FROM EMP
+                                WHERE JOB='SALESMAN')
+
+OP=
+
+EMP_NAME   DEPT_NAME      MGR_NAME   MGR_DNAME      MGRS_NAME  MGRS_MGR_DNAME
+---------- -------------- ---------- -------------- ---------- --------------
+ADAMS      RESEARCH       SCOTT      RESEARCH       JONES      ACCOUNTING
+ADAMS      RESEARCH       SCOTT      RESEARCH       JONES      RESEARCH
+
+
+
+SELECT COUNT(*),TRAINNO
+ FROM TRAIN
+GROUP BY TRAIN_NO
+HAVING COUNT(*)>=2;
+
+
+OUTPUT
+COUNT(*)  TRAIN_NO   TRAIN NAME
+   2                     16592       HUMPI EXP
+   2                       22691     RAJDHANI EXP
+
+
+
+
+TRAIN_NAME     TICKE _NO    PNAME    STATUS
+
+SHATABDI EXP    2314657981   SNEHA    WAITING
+SHATABDI EXP    2314657981   ARUN       WAITING
+SHATABDI EXP    895412328      MANOJ     RAC
+SHATABDI EXP     3468972108   RAJU         RAC
+SHATABDI EXP     3468972108   PRASHANT    RAC
+
+
+TRAIN NM   DESITINATION    TRAIN NO COACH      PLATFORM          STATUS  
+RAJDHANI     DELHI                  22691         S421                    1                 CONFIRMED
+
+
+SELECT LOC FROM DEPT
+WHERE DEPTNO IN(SELECT DEPTNO FROM EMP
+WHERE SAL IN(SELECT SAL  FROM (SELECT ROWNUM AS SRNO,SAL  
+                                                                     FROM (SELECT DISTINCT SAL FROM EMP
+                                                                                              ORDER BY SAL DESC))
+WHERE SRNO=7));
+
+
+OUTPUT=
+LOC
+-------
+CHICACO
+
+
+SELECT COUNT(*),MAX(SAL),MIN(SAL),SUM(SAL),AVG(SAL),JOB
+FROM EMP
+WHERE  MOD(TO_CHAR(HIREDATE,'YY'),4)=0
+AND   MOD(TO_CHAR(HIREDATE,'YYYY'),100)!=0
+OR  MOD(TO_CHAR(HIREDATE,'YYYY'),400)=0
+AND TO_CHAR(HIREDATE,'DY')  IN('MON','WED','FRI','SUN')
+AND  SAL>=3000
+AND SAL<=1500
+HAVING COUNT(*)>=1
+GROUP BY JOB;
+
+
+OUTPUT=
+ COUNT(*)   MAX(SAL)   MIN(SAL)   SUM(SAL)   AVG(SAL)         JOB
+---------             ----------        ----------       ----------      ----------           ---------
+        1               800              800                  800              800             CLERK
+
+SELECT E1.ENAME AS EMP_NAME,E2.ENAME  AS  MGR_NAME,D1.DNAME AS DEPT_LOC
+FROM   E1 EMP,E2 EMP, DEPT D1
+WHERE  E1.EMPNO=E2.MGR
+AND  E1.DEPTNO=D1.DEPTNO
+AND E1.DEPTNO IN(SELECT D1.DEPTNO FROM DEPT
+                                     WHERE E2.SAL IN(SELECT ROWNUM AS SRNO 
+                                                                         FROM (SELECT DISTINCT SAL FROM EMP E2
+                                                                                        ORDER BY E2.SAL ASC))
+WHERE SRNO=8);
+
+=============
+SELECT   E1.ENAME AS EMP_NAME, E2.ENAME AS MGR_NAME,D1.DNAME AS DEPT_LOC
+FROM  EMP E1,EMP E2,DEPT D1
+WHERE  E1.MGR = E2.EMPNO
+              E1.DEPTNO = D1.DEPTNO
+AND  E1.DEPTNO IN ( SELECT D1.DEPTNO FROM DEPT D1
+                                       WHERE E1.SAL IN (SELECT SAL 
+                                                                           FROM (SELECT ROWNUM AS SRNO ,SAL                                       
+                                                                           FROM (  SELECT DISTINCT SAL FROM EMP
+                                                                                  ORDER BY SAL ASC) ))
+                  
+                                WHERE SRNO = 8));
+          
+
+
+
+10] WAQTD NUMBER OF EMP’S , MAX, MIN, TOTAL & AVERAGE
+WAGES FOR EACH DESIGNATION IF EMP IS EARNING MORE THAN
+ALL THE CLERK’S & NOT HAVING ANY COMMISSION WITH AT LEAST
+2 EMP’S IN EACH JOB & AT MOST 3000 RPS AVG SAL IN EACH JOB.
+
+SELECT JOB, COUNT(*) ,MAX(SAL) , MIN(SAL) ,SUM(SAL) ,AVG(SAL) 
+FROM EMP
+WHERE SAL > (SELECT MAX(SAL) FROM EMP
+                            WHERE JOB = 'CLERK')  
+    AND (COMM IS NULL OR COMM = 0)                     
+GROUP BY JOB
+HAVING COUNT(*) >= 2                                    
+ AND AVG(SAL) <= 3000 ;
+       
+OUTPUT=
+JOB                  COUNT(*)      MAX(SAL)   MIN(SAL)   SUM(SAL)   AVG(SAL)
+---------              ------------
+
+
+21        ----------         ----------      ----------        ----------
+MANAGER             3                 2975             2450          8275            2758.33333
+ANALYST              2                  3000            3000           6000              3000
+   
+
+
+WAQTD ODD NTH RECORDS  MANAGERS DNAME  EXCEPT CLERK MANAGERS
+
+
+
+SELECT * FROM ( SELECT EMP.*, ROW_NUMBER() OVER (ORDER BY EMPNO ASC) AS ROWNUMBER
+    FROM EMP) 
+WHERE ROWNUMBER = 7;  
+OP=
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO  ROWNUMBER
+---------- ---------- --------- ---------- --------- ---------- ---------- ---------- ----------
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10          7
+
+
+
+
+SELECT INITCAP(ENAME),HIREDATE,  EXTRACT(YEAR FROM HIREDATE), ROUND(SAL * 1.23, 0) 
+FROM EMP
+WHERE 
+    TO_CHAR(HIREDATE, 'DAY') IN ('MONDAY   ', 'THURSDAY ', 'WEDNESDAY')  
+    AND MOD(EMPNO, 2) = 0                 
+    AND REGEXP_LIKE(ENAME, '[AEUOaeuo]')   
+    AND ROUND(SAL * 1.23, 0) <= 3659; 
+
+OP=
+
+INITCAP(EN HIREDATE  EXTRACT(YEARFROMHIREDATE) ROUND(SAL*1.23,0)
+---------- --------- ------------------------- -----------------
+Jones      02-APR-81                      1981              3659
+Martin     28-SEP-81                      1981              1538
+James      03-DEC-81                      1981              1169
+
+
